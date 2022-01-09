@@ -1,7 +1,12 @@
 package main
 
-import flashtext "github.com/ayoyu/flashtext/pkg"
+import (
+	"fmt"
+
+	"github.com/ayoyu/flashtext/flash"
+)
 
 func main() {
-	flashtext.PrintHello()
+	trie := flash.NewFlashKeywords(false)
+	fmt.Println(trie.Size())
 }
