@@ -138,6 +138,7 @@ type Result struct {
 }
 
 func (tree *FlashKeywords) Search(text string) []Result {
+	n := len(text)
 	if !tree.caseSensitive {
 		text = strings.ToLower(text)
 	}
@@ -154,8 +155,10 @@ func (tree *FlashKeywords) Search(text string) []Result {
 				isPrefix := false
 				if currentNode.keep {
 					// possibility to be a prefix of another continous word
-					if _, ok := currentNode.children[rune(text[idx+1])]; ok {
-						isPrefix = true
+					if idx+1 < n {
+						if _, ok := currentNode.children[rune(text[idx+1])]; ok {
+							isPrefix = true
+						}
 					}
 				}
 				if currentNode.sizeCleans > 0 {
