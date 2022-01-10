@@ -102,15 +102,17 @@ func TestInsertShortThenLongSearch(t *testing.T) {
 	if len(res) != 2 {
 		t.Errorf("Res should have 2 results cat and catch")
 	} else {
+		prefixFlag := true
 		for i := 0; i < 2; i++ {
-			if res[i].key == keys[i] && text[res[i].start:res[i].end+1] == keys[i] {
+			if res[i].key == keys[i] && text[res[i].start:res[i].end+1] == keys[i] && res[i].isPrefix == prefixFlag {
 				t.Logf("Found Key %v, PASS", keys[i])
+				prefixFlag = false
 			} else {
 				t.Errorf("Error Key %v FAILED %v", keys[i], res[i])
 			}
 		}
 	}
-
+	t.Logf("res: %v", res)
 }
 
 func TestInsertLongThenShortSearch(t *testing.T) {
@@ -125,14 +127,17 @@ func TestInsertLongThenShortSearch(t *testing.T) {
 		t.Errorf("Res should have 2 results cat and catch")
 	} else {
 		t.Logf("Modulo %v", 2%len(keys))
+		prefixFlag := true
 		for i := 0; i < 2; i++ {
-			if res[i].key == keys[(i+1)%len(keys)] && text[res[i].start:res[i].end+1] == keys[(i+1)%len(keys)] {
+			if res[i].key == keys[(i+1)%len(keys)] && text[res[i].start:res[i].end+1] == keys[(i+1)%len(keys)] && res[i].isPrefix == prefixFlag {
 				t.Logf("Found Key %v, PASS", keys[(i+1)%len(keys)])
+				prefixFlag = false
 			} else {
 				t.Errorf("Error Key %v FAILED %v", keys[(i+1)%len(keys)], res[i])
 			}
 		}
 	}
+	t.Logf("res: %v", res)
 }
 
 func TestCaseSensitive(t *testing.T) {
@@ -295,4 +300,33 @@ func TestOverlapRemoveKeys_3(t *testing.T) {
 	}
 	t.Logf("%v nbrNode: %v %v", trie.GetAllKeywords(), trie.nbrNodes, nodes)
 
+}
+
+func TestGoBackToRootTrick(t *testing.T) {
+	keys := []string{"chetoos", "055-5647-3456", "chetoosPiza"}
+	// error no proper space ' ' btw chetoos and 055...
+	// knowing that we still (keep=true) going because of the keyword chetoosPiza
+	text := "call chetoos055-5647-3456 chetoosPiza"
+	trie := NewFlashKeywords(true)
+	for _, k := range keys {
+		trie.Add(k)
+	}
+	res := trie.Search(text)
+	expected := []struct {
+		key        string
+		flagPrefix bool
+	}{
+		{"chetoos", false},
+		{"055-5647-3456", false},
+		{"chetoos", true},
+		{"chetoosPiza", false},
+	}
+	for i := 0; i < len(res); i++ {
+		if res[i].key == expected[i].key && res[i].isPrefix == expected[i].flagPrefix {
+			t.Logf("PASS Key %v", res[i].key)
+		} else {
+			t.Errorf("FAILED Key %v", res[i].key)
+		}
+	}
+	t.Logf("res: %v", res)
 }

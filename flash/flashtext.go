@@ -131,6 +131,7 @@ func (tree *FlashKeywords) RemoveKey(word string) bool {
 
 type Result struct {
 	key       string
+	isPrefix  bool // support for key the smallest(the prefix) and the longest match
 	cleanWord string
 	start     int
 	end       int
@@ -150,10 +151,18 @@ func (tree *FlashKeywords) Search(text string) []Result {
 			start = idx + 1
 		} else {
 			if currentNode.isWord {
+				isPrefix := false
+				if currentNode.keep {
+					// possibility to be a prefix of another continous word
+					if _, ok := currentNode.children[rune(text[idx+1])]; ok {
+						isPrefix = true
+					}
+				}
 				if currentNode.sizeCleans > 0 {
 					for clean := range currentNode.cleanWords {
 						res = append(res, Result{
 							key:       currentNode.key,
+							isPrefix:  isPrefix,
 							cleanWord: clean,
 							start:     start,
 							end:       idx,
@@ -161,12 +170,17 @@ func (tree *FlashKeywords) Search(text string) []Result {
 					}
 				} else {
 					res = append(res, Result{
-						key:   currentNode.key,
-						start: start,
-						end:   idx,
+						key:      currentNode.key,
+						isPrefix: isPrefix,
+						start:    start,
+						end:      idx,
 					})
 				}
-				if !currentNode.keep {
+				if !isPrefix {
+					// go back to root with 2 conditions (see TestGoBackToRootTrick):
+					// 	- simple one if keep=false (isPrefix=false by default)
+					// 	- keep can be true but when we look one step ahead
+					// 	  no node is founded => Go back to root
 					currentNode = tree.root
 					start = idx + 1
 				}
