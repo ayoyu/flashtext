@@ -1,8 +1,14 @@
 package flash
 
 import (
+	"bufio"
+	"fmt"
+	"log"
+	"os"
 	"strings"
 )
+
+const separator string = "=>"
 
 type TreeNode struct {
 	selfRune   rune
@@ -99,6 +105,71 @@ func (tree *FlashKeywords) Add(word string) {
 
 func (tree *FlashKeywords) AddKeyWord(word string, cleanWord string) {
 	tree.addKeyWord(word, cleanWord)
+}
+
+func (tree *FlashKeywords) AddFromMap(keys2synonyms map[string][]string) {
+	// keyword_dict = {
+	//  "java": ["java_2e", "java programing"],
+	//  "product management": ["PM", "product manager"]
+	// }
+	for key, listSynonyms := range keys2synonyms {
+		for _, synonym := range listSynonyms {
+			tree.addKeyWord(synonym, key)
+		}
+	}
+}
+
+func (tree *FlashKeywords) AddFromFile(filePath string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	defer file.Close()
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := scanner.Text()
+		synonym2key := strings.Split(line, separator)
+		if len(synonym2key) == 2 {
+			tree.addKeyWord(synonym2key[0], synonym2key[1])
+		} else if len(synonym2key) == 1 {
+			tree.addKeyWord(synonym2key[0], "")
+		} else {
+			// skip line
+			log.Printf("Warning: Skipped malformed line %s correct format: key1=>key2", line)
+		}
+	}
+	return nil
+}
+
+func (tree *FlashKeywords) GetKeysWord(word string) ([]string, error) {
+	var res []string
+	currentNode := tree.root
+	for _, char := range word {
+		currentNode = currentNode.children[char]
+		if currentNode == nil {
+			return res, fmt.Errorf("The word %s doesn't exists in the keywords dictionnary", word)
+		}
+	}
+	if !currentNode.isWord {
+		return res, fmt.Errorf("The word %s doesn't exists in the keywords dictionnary", word)
+	}
+	for w := range currentNode.cleanWords {
+		res = append(res, w)
+	}
+
+	return res, nil
+}
+
+func (tree *FlashKeywords) Contains(word string) bool {
+	currentNode := tree.root
+	for _, char := range word {
+		currentNode = currentNode.children[char]
+		if currentNode == nil {
+			return false
+		}
+	}
+	return currentNode.isWord
 }
 
 func (tree *FlashKeywords) RemoveKey(word string) bool {

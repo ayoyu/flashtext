@@ -330,3 +330,78 @@ func TestGoBackToRootTrick(t *testing.T) {
 	}
 	t.Logf("res: %v", res)
 }
+
+func TestAddFromMap(t *testing.T) {
+	trie := NewFlashKeywords(true)
+	hMap := map[string][]string{
+		"java":               {"java_2e", "java programing"},
+		"product management": {"PM", "product manager"},
+	}
+	testdata := []struct {
+		key        string
+		originWord string
+	}{
+		{"java_2e", "java"},
+		{"java programing", "java"},
+		{"PM", "product management"},
+		{"product manager", "product management"},
+	}
+	trie.AddFromMap(hMap)
+	t.Logf("trie Size: %v", trie.Size())
+	for _, item := range testdata {
+		listWords, err := trie.GetKeysWord(item.key)
+		t.Logf("key: %v  listWords: %v", item.key, listWords)
+		if err != nil {
+			t.Error(err)
+		}
+		if item.originWord != listWords[0] {
+			t.Errorf("FAILED Key: %v", item.key)
+		}
+	}
+
+}
+
+func TestAddFromFile(t *testing.T) {
+	trie := NewFlashKeywords(true)
+	trie.AddFromFile("./../testdata/Keys2Synonyms.txt")
+	testdata := []struct {
+		key        string
+		originWord string
+	}{
+		{"java_2e", "java"},
+		{"java programing", "java"},
+		{"python3.3", "python"},
+		{"pypy", "python"},
+		{"python2", "python"},
+		{"SWE", "Software Engineer"},
+		{"Developper", "Software Engineer"},
+		{"Backend Engineer", "Software Engineer"},
+		{"Banana", ""},
+		{"Chetoos", ""},
+	}
+	for _, item := range testdata {
+		listWords, err := trie.GetKeysWord(item.key)
+		t.Logf("key: %v  listWords: %v", item.key, listWords)
+		if err != nil {
+			t.Error(err)
+		}
+		if listWords != nil {
+			if item.originWord != listWords[0] {
+				t.Errorf("FAILED Key: %v", item.key)
+			}
+		}
+
+	}
+}
+
+func TestContains(t *testing.T) {
+	trie := NewFlashKeywords(false)
+	trie.Add("FoO")
+	// no case sensitive
+	if !trie.Contains("foo") {
+		t.Errorf("FAILED Key Foo")
+	}
+	if trie.Contains("Anything") {
+		t.Errorf("FAILED")
+	}
+}

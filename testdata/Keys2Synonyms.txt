@@ -1,0 +1,11 @@
+java_2e=>java
+java programing=>java
+python3.3=>python
+pypy=>python
+python2=>python
+SWE=>Software Engineer
+Developper=>Software Engineer
+Backend Engineer=>Software Engineer
+Banana
+Chetoos
+notVlid1=>notValid2=>notValid3
