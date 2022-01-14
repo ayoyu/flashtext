@@ -43,37 +43,33 @@ func TestAddKeyWordAndSize(t *testing.T) {
 
 func TestGetAllKeywords(t *testing.T) {
 	trie := NewFlashKeywords(true)
-	keys2Cleans := map[string][]string{
-		"Earth":     {"planet"},
-		"Mars":      {"planet"},
-		"sun":       {"star", "Sun"},
-		"python3.5": {"python"},
-		"python3":   {"python"},
+	keys2Clean := []struct {
+		key       string
+		cleanWord string
+	}{
+		{"Earth", "planet"},
+		{"Mars", "planet"},
+		{"sun", "star"},
+		{"python3.5", "python"},
+		{"python3", "python"},
 	}
-	for key, data := range keys2Cleans {
-		for _, clean := range data {
-			trie.AddKeyWord(key, clean)
-		}
+	for _, item := range keys2Clean {
+		trie.AddKeyWord(item.key, item.cleanWord)
 	}
-	if trie.Size() != len(keys2Cleans) {
-		t.Errorf("trie.AddKeyWord FAILED, Size is expected to be equal: %d", len(keys2Cleans))
+	if trie.Size() != len(keys2Clean) {
+		t.Errorf("trie.AddKeyWord FAILED, Size is expected to be equal: %d", len(keys2Clean))
 	}
 
 	allKeysWords := trie.GetAllKeywords()
 
-	for key, data := range keys2Cleans {
-		setCleans, ok := allKeysWords[key]
-		if !ok {
-			t.Errorf("the Key %v does not exist in the tree: ", key)
+	for _, item := range keys2Clean {
+		if cleanWord, ok := allKeysWords[item.key]; !ok || cleanWord != item.cleanWord {
+			t.Errorf("FAILED for key: %s", item.key)
+		} else {
+			t.Logf("Key %v with CleanWord %v PASS", item.key, item.cleanWord)
 		}
-		for _, item := range data {
-			if _, ok := setCleans[item]; !ok {
-				t.Errorf("Clean Name %v does not exist for the key %v", item, key)
-			}
-		}
-		t.Logf("Key %v with setCleanNames %v PASS", key, setCleans)
 	}
-
+	t.Logf("allKeysWords: %v", allKeysWords)
 }
 
 func TestNumberofNodes(t *testing.T) {
@@ -126,7 +122,6 @@ func TestInsertLongThenShortSearch(t *testing.T) {
 	if len(res) != 2 {
 		t.Errorf("Res should have 2 results cat and catch")
 	} else {
-		t.Logf("Modulo %v", 2%len(keys))
 		prefixFlag := true
 		for i := 0; i < 2; i++ {
 			if res[i].key == keys[(i+1)%len(keys)] && text[res[i].start:res[i].end+1] == keys[(i+1)%len(keys)] && res[i].isPrefix == prefixFlag {
@@ -152,6 +147,7 @@ func TestCaseSensitive(t *testing.T) {
 			t.Errorf("FAILED key: %v", keys[i])
 		}
 	}
+	t.Logf("allkeys: %v", allKeys)
 }
 
 func TestFalseCaseSensitiveSearch(t *testing.T) {
@@ -349,12 +345,12 @@ func TestAddFromMap(t *testing.T) {
 	trie.AddFromMap(hMap)
 	t.Logf("trie Size: %v", trie.Size())
 	for _, item := range testdata {
-		listWords, err := trie.GetKeysWord(item.key)
-		t.Logf("key: %v  listWords: %v", item.key, listWords)
+		cleanWord, err := trie.GetKeysWord(item.key)
+		t.Logf("key: %v  cleanWord: %v", item.key, cleanWord)
 		if err != nil {
 			t.Error(err)
 		}
-		if item.originWord != listWords[0] {
+		if item.originWord != cleanWord {
 			t.Errorf("FAILED Key: %v", item.key)
 		}
 	}
@@ -380,15 +376,13 @@ func TestAddFromFile(t *testing.T) {
 		{"Chetoos", ""},
 	}
 	for _, item := range testdata {
-		listWords, err := trie.GetKeysWord(item.key)
-		t.Logf("key: %v  listWords: %v", item.key, listWords)
+		cleanWord, err := trie.GetKeysWord(item.key)
+		t.Logf("key: %v  listWords: %v", item.key, cleanWord)
 		if err != nil {
 			t.Error(err)
 		}
-		if listWords != nil {
-			if item.originWord != listWords[0] {
-				t.Errorf("FAILED Key: %v", item.key)
-			}
+		if item.originWord != cleanWord {
+			t.Errorf("FAILED Key: %v", item.key)
 		}
 
 	}
@@ -403,5 +397,34 @@ func TestContains(t *testing.T) {
 	}
 	if trie.Contains("Anything") {
 		t.Errorf("FAILED")
+	}
+}
+
+func TestAddWordMultipleTimes(t *testing.T) {
+	trie := NewFlashKeywords(true)
+	key := "Foo"
+	trie.Add(key)
+	cleanWord, err := trie.GetKeysWord(key)
+	if (cleanWord != "" || err != nil) && trie.nbrNodes != len(key)+1 && trie.Size() != 1 {
+		t.Errorf("FAIL nbrNodes must equal %v & size=1", len(key)+1)
+	} else {
+		t.Logf("curr cleanWord: %v", cleanWord)
+	}
+	trie.addKeyWord("Foo", "Zoo")
+	if trie.nbrNodes != len(key)+1 && trie.Size() != 1 {
+		t.Errorf("FAIL nbrNodes must equal %v & size=1", len(key)+1)
+	}
+	cleanWord, err = trie.GetKeysWord(key)
+	if (cleanWord != "Zoo" || err != nil) && trie.Size() != 1 && trie.nbrNodes != len(key)+1 {
+		t.Errorf("FAIL")
+	} else {
+		t.Logf("curr cleanWord: %v", cleanWord)
+	}
+	trie.addKeyWord("Foo", "Zoo2")
+	cleanWord, err = trie.GetKeysWord(key)
+	if (cleanWord != "Zoo2" || err != nil) && trie.Size() != 1 && trie.nbrNodes != len(key)+1 {
+		t.Errorf("FAIL")
+	} else {
+		t.Logf("curr cleanWord: %v", cleanWord)
 	}
 }

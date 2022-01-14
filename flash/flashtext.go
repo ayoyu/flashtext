@@ -11,19 +11,17 @@ import (
 const separator string = "=>"
 
 type TreeNode struct {
-	selfRune   rune
-	children   map[rune]*TreeNode
-	isWord     bool
-	cleanWords map[string]struct{}
-	sizeCleans int
-	keep       bool
-	key        string
+	selfRune  rune
+	children  map[rune]*TreeNode
+	isWord    bool
+	cleanWord string
+	keep      bool
+	key       string
 }
 
 func newTreeNode() *TreeNode {
 	return &TreeNode{
-		children:   make(map[rune]*TreeNode),
-		cleanWords: make(map[string]struct{}),
+		children: make(map[rune]*TreeNode),
 	}
 }
 
@@ -46,8 +44,8 @@ func (tree *FlashKeywords) Size() int {
 	return tree.size
 }
 
-func (tree *FlashKeywords) GetAllKeywords() map[string]map[string]struct{} {
-	key2Clean := make(map[string]map[string]struct{}, tree.size)
+func (tree *FlashKeywords) GetAllKeywords() map[string]string {
+	key2Clean := make(map[string]string, tree.size)
 	stack := make([]*TreeNode, 0, tree.nbrNodes)
 	stack = append(stack, tree.root)
 	_size := 1
@@ -56,7 +54,7 @@ func (tree *FlashKeywords) GetAllKeywords() map[string]map[string]struct{} {
 		stack = stack[:_size-1]
 		_size--
 		if node.isWord {
-			key2Clean[node.key] = node.cleanWords
+			key2Clean[node.key] = node.cleanWord
 		}
 		for _, child := range node.children {
 			stack = append(stack, child)
@@ -83,12 +81,6 @@ func (tree *FlashKeywords) addKeyWord(word string, cleanWord string) {
 		currentNode = currentNode.children[char]
 		currentNode.selfRune = char
 	}
-	if cleanWord != "" {
-		if _, ok := currentNode.cleanWords[cleanWord]; !ok {
-			currentNode.sizeCleans++
-		}
-		currentNode.cleanWords[cleanWord] = struct{}{}
-	}
 	if !currentNode.isWord {
 		tree.size++
 		currentNode.isWord = true
@@ -96,6 +88,13 @@ func (tree *FlashKeywords) addKeyWord(word string, cleanWord string) {
 			currentNode.keep = true
 		}
 		currentNode.key = word
+		currentNode.cleanWord = cleanWord
+	} else if cleanWord != "" {
+		if currentNode.cleanWord != "" {
+			log.Printf("Warning: overwrite the clean word of %s from %s to %s",
+				word, currentNode.cleanWord, cleanWord)
+		}
+		currentNode.cleanWord = cleanWord
 	}
 }
 
@@ -142,23 +141,19 @@ func (tree *FlashKeywords) AddFromFile(filePath string) error {
 	return nil
 }
 
-func (tree *FlashKeywords) GetKeysWord(word string) ([]string, error) {
-	var res []string
+func (tree *FlashKeywords) GetKeysWord(word string) (string, error) {
 	currentNode := tree.root
 	for _, char := range word {
 		currentNode = currentNode.children[char]
 		if currentNode == nil {
-			return res, fmt.Errorf("The word %s doesn't exists in the keywords dictionnary", word)
+			return "", fmt.Errorf("The word %s doesn't exists in the keywords dictionnary", word)
 		}
 	}
 	if !currentNode.isWord {
-		return res, fmt.Errorf("The word %s doesn't exists in the keywords dictionnary", word)
-	}
-	for w := range currentNode.cleanWords {
-		res = append(res, w)
+		return "", fmt.Errorf("The word %s doesn't exists in the keywords dictionnary", word)
 	}
 
-	return res, nil
+	return currentNode.cleanWord, nil
 }
 
 func (tree *FlashKeywords) Contains(word string) bool {
@@ -232,24 +227,13 @@ func (tree *FlashKeywords) Search(text string) []Result {
 						}
 					}
 				}
-				if currentNode.sizeCleans > 0 {
-					for clean := range currentNode.cleanWords {
-						res = append(res, Result{
-							key:       currentNode.key,
-							isPrefix:  isPrefix,
-							cleanWord: clean,
-							start:     start,
-							end:       idx,
-						})
-					}
-				} else {
-					res = append(res, Result{
-						key:      currentNode.key,
-						isPrefix: isPrefix,
-						start:    start,
-						end:      idx,
-					})
-				}
+				res = append(res, Result{
+					key:       currentNode.key,
+					isPrefix:  isPrefix,
+					cleanWord: currentNode.cleanWord,
+					start:     start,
+					end:       idx,
+				})
 				if !isPrefix {
 					// go back to root with 2 conditions (see TestGoBackToRootTrick):
 					// 	- simple one if keep=false (isPrefix=false by default)
