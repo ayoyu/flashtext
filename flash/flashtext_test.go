@@ -499,8 +499,18 @@ func TestReplaceKeyAtTheEnd(t *testing.T) {
 	}
 	t.Logf("%v", new)
 
-	// trie3 := NewFlashKeywords(false)
-	// trie3.addKeyWord("Foo", "JOJO")
-	// tt := "HU foo KIOUI"
-	// t.Logf("%v", trie3.Replace(tt))
+}
+
+func TestRepalceWithFalseCaseSensitive(t *testing.T) {
+	trie := NewFlashKeywords(false)
+	trie.addKeyWord("Foo", "JOJO")
+	text := "HU! foo KIWI"
+	newText := trie.Replace(text)
+	rText := "hu! jojo kiwi"
+	if newText != rText {
+		t.Errorf("FAIL %v != %v", newText, rText)
+	} else {
+		t.Logf("%v", newText)
+	}
+
 }

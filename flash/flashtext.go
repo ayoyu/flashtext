@@ -68,6 +68,7 @@ func (tree *FlashKeywords) GetAllKeywords() map[string]string {
 func (tree *FlashKeywords) addKeyWord(word string, cleanWord string) {
 	if !tree.caseSensitive {
 		word = strings.ToLower(word)
+		cleanWord = strings.ToLower(cleanWord)
 	}
 	currentNode := tree.root
 	for _, char := range word {
