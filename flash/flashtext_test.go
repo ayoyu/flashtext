@@ -428,3 +428,79 @@ func TestAddWordMultipleTimes(t *testing.T) {
 		t.Logf("curr cleanWord: %v", cleanWord)
 	}
 }
+
+func TestReplaceCleanWordLessThenKey(t *testing.T) {
+	// len(rune(cleanWord)) < len(rune(key))
+	trie := NewFlashKeywords(true)
+	trie.AddKeyWord("Chetoos", "Cat")
+	text := "With Chetoos in place"
+	newText := trie.Replace(text)
+	rText := "With Cat in place"
+	if newText != rText {
+		t.Errorf("FAIL %v != %v", newText, rText)
+	} else {
+		t.Logf("newText: %v", newText)
+	}
+}
+
+func TestReplaceCleanWordGreaterThenKey(t *testing.T) {
+	// len(rune(cleanWord)) > len(rune(key))
+	trie := NewFlashKeywords(true)
+	trie.AddKeyWord("Cat", "Chetoos")
+	text := "With Cat in place"
+	newText := trie.Replace(text)
+	rText := "With Chetoos in place"
+	if newText != rText {
+		t.Errorf("FAIL %v != %v", newText, rText)
+	} else {
+		t.Logf("newText: %v", newText)
+	}
+}
+
+func TestReplaceCleanWordSameLenghtKey(t *testing.T) {
+	// len(rune(cleanWord)) == len(rune(key))
+	trie := NewFlashKeywords(true)
+	trie.AddKeyWord("Cat", "Bee")
+	text := "With Cat in place"
+	newText := trie.Replace(text)
+	rText := "With Bee in place"
+	if newText != rText {
+		t.Errorf("FAIL %v != %v", newText, rText)
+	} else {
+		t.Logf("newText: %v", newText)
+	}
+}
+func TestReplaceKeyAtTheEnd(t *testing.T) {
+	trie := NewFlashKeywords(true)
+	trie.AddKeyWord("in place", "gone")
+	text := "With Cat in place"
+	newText := trie.Replace(text)
+	rText := "With Cat gone"
+	if newText != rText {
+		t.Errorf("FAIL %v != %v", newText, rText)
+	} else {
+		t.Logf("newText: %v", newText)
+	}
+	trie.AddKeyWord("in place", "in Peeeeeeeeeace")
+	newText2 := trie.Replace(text)
+	rText2 := "With Cat in Peeeeeeeeeace"
+	if newText2 != rText2 {
+		t.Errorf("FAIL %v != %v", newText2, rText2)
+	} else {
+		t.Logf("newText: %v", newText2)
+	}
+	// random test
+	trie2 := NewFlashKeywords(true)
+	trie2.addKeyWord("055-5647-3456", "055-XXX")
+	text3 := "call chetoos055-5647-3456 chetoosPiza"
+	new := trie2.Replace(text3)
+	if new != "call chetoos055-XXX chetoosPiza" {
+		t.Errorf("FAIL")
+	}
+	t.Logf("%v", new)
+
+	// trie3 := NewFlashKeywords(false)
+	// trie3.addKeyWord("Foo", "JOJO")
+	// tt := "HU foo KIOUI"
+	// t.Logf("%v", trie3.Replace(tt))
+}

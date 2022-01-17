@@ -248,3 +248,70 @@ func (tree *FlashKeywords) Search(text string) []Result {
 	}
 	return res
 }
+
+func (tree *FlashKeywords) Replace(text string) string {
+	if !tree.caseSensitive {
+		text = strings.ToLower(text)
+	}
+	n := len(text)
+	var buf []rune = make([]rune, 0, n)
+	bufSize := 0
+	currentNode := tree.root
+	// track the tail of the buf to know if append or set with a new rune buf[lastChange]
+	// in the case lenght of key is different from lenght of cleanWord
+	lastChange := 0
+	for idx, char := range text {
+		if lastChange < bufSize {
+			buf[lastChange] = char
+			lastChange++
+		} else {
+			buf = append(buf, char)
+			bufSize++
+			lastChange = bufSize
+		}
+		currentNode = currentNode.children[char]
+		if currentNode == nil {
+			currentNode = tree.root
+		} else if currentNode.isWord {
+			if currentNode.cleanWord != "" {
+				// repalce opp `leftmost match first`(replace key with the cleanWord)
+				runeKeySize := len([]rune(currentNode.key))
+				// fmt.Println("runSize: ", runeKeySize)
+				start := bufSize - runeKeySize
+				//fmt.Println("start: ", start, buf)
+				lastChange = start
+				for _, cChar := range currentNode.cleanWord {
+					//fmt.Println("cChar: ", cChar, string(cChar))
+					if start < bufSize {
+						buf[start] = cChar
+						start++
+						lastChange++
+					} else {
+						buf = append(buf, cChar)
+						bufSize++
+						lastChange = bufSize
+						start = bufSize
+					}
+					//fmt.Println("start: ", start, buf)
+
+				}
+				// done with replacement Go back to root
+				currentNode = tree.root
+			} else if currentNode.keep {
+				// in case the currentNode(isWord) doesn't have a cleanWord
+				// worth to check if it is a prefix of another `big word`
+				// to make the replacement opp on the `big word`
+				if _, ok := currentNode.children[rune(text[idx+1])]; !ok {
+					// nothing found go back to root
+					currentNode = tree.root
+				}
+			} else {
+				currentNode = tree.root
+			}
+
+		}
+
+	}
+
+	return string(buf[:lastChange])
+}
