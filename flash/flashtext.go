@@ -10,23 +10,23 @@ import (
 
 const separator string = "=>"
 
-type TreeNode struct {
+type TrieNode struct {
 	selfRune  rune
-	children  map[rune]*TreeNode
+	children  map[rune]*TrieNode
 	isWord    bool
 	cleanWord string
 	keep      bool
 	key       string
 }
 
-func newTreeNode() *TreeNode {
-	return &TreeNode{
-		children: make(map[rune]*TreeNode),
+func newTrieNode() *TrieNode {
+	return &TrieNode{
+		children: make(map[rune]*TrieNode),
 	}
 }
 
 type FlashKeywords struct {
-	root          *TreeNode
+	root          *TrieNode
 	size          int // nbr of keys
 	nbrNodes      int
 	caseSensitive bool
@@ -34,7 +34,7 @@ type FlashKeywords struct {
 
 func NewFlashKeywords(caseSensitive bool) *FlashKeywords {
 	return &FlashKeywords{
-		root:          newTreeNode(),
+		root:          newTrieNode(),
 		nbrNodes:      1,
 		caseSensitive: caseSensitive,
 	}
@@ -46,7 +46,7 @@ func (tree *FlashKeywords) Size() int {
 
 func (tree *FlashKeywords) GetAllKeywords() map[string]string {
 	key2Clean := make(map[string]string, tree.size)
-	stack := make([]*TreeNode, 0, tree.nbrNodes)
+	stack := make([]*TrieNode, 0, tree.nbrNodes)
 	stack = append(stack, tree.root)
 	_size := 1
 	for _size != 0 {
@@ -76,7 +76,7 @@ func (tree *FlashKeywords) addKeyWord(word string, cleanWord string) {
 			currentNode.keep = true
 		}
 		if _, ok := currentNode.children[char]; !ok {
-			currentNode.children[char] = newTreeNode()
+			currentNode.children[char] = newTrieNode()
 			tree.nbrNodes++
 		}
 		currentNode = currentNode.children[char]
@@ -169,8 +169,8 @@ func (tree *FlashKeywords) Contains(word string) bool {
 }
 
 func (tree *FlashKeywords) RemoveKey(word string) bool {
-	var nextNode *TreeNode
-	parent := make(map[*TreeNode]*TreeNode)
+	var nextNode *TrieNode
+	parent := make(map[*TrieNode]*TrieNode)
 	currentNode := tree.root
 	for _, currChar := range word {
 		if _, ok := currentNode.children[currChar]; !ok {
@@ -185,9 +185,11 @@ func (tree *FlashKeywords) RemoveKey(word string) bool {
 	}
 	currentNode.isWord = false
 	tree.size--
+	var parentNode *TrieNode
+	var childRune rune
 	for currentNode != tree.root && len(currentNode.children) == 0 && !currentNode.isWord {
-		parentNode := parent[currentNode]
-		childRune := currentNode.selfRune
+		parentNode = parent[currentNode]
+		childRune = currentNode.selfRune
 		currentNode = nil
 		tree.nbrNodes--
 		delete(parentNode.children, childRune)
@@ -277,12 +279,9 @@ func (tree *FlashKeywords) Replace(text string) string {
 			if currentNode.cleanWord != "" {
 				// repalce opp `leftmost match first`(replace key with the cleanWord)
 				runeKeySize := len([]rune(currentNode.key))
-				// fmt.Println("runSize: ", runeKeySize)
 				start := bufSize - runeKeySize
-				//fmt.Println("start: ", start, buf)
 				lastChange = start
 				for _, cChar := range currentNode.cleanWord {
-					//fmt.Println("cChar: ", cChar, string(cChar))
 					if start < bufSize {
 						buf[start] = cChar
 						start++
@@ -293,7 +292,6 @@ func (tree *FlashKeywords) Replace(text string) string {
 						lastChange = bufSize
 						start = bufSize
 					}
-					//fmt.Println("start: ", start, buf)
 
 				}
 				// done with replacement Go back to root
