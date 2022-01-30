@@ -199,11 +199,11 @@ func (tree *FlashKeywords) RemoveKey(word string) bool {
 }
 
 type Result struct {
-	key       string
-	isPrefix  bool // support for key the smallest(the prefix) and the longest match
-	cleanWord string
-	start     int
-	end       int
+	Key       string
+	IsPrefix  bool // support for key the smallest(the prefix) and the longest match
+	CleanWord string
+	Start     int
+	End       int
 }
 
 func (tree *FlashKeywords) Search(text string) []Result {
@@ -231,11 +231,11 @@ func (tree *FlashKeywords) Search(text string) []Result {
 					}
 				}
 				res = append(res, Result{
-					key:       currentNode.key,
-					isPrefix:  isPrefix,
-					cleanWord: currentNode.cleanWord,
-					start:     start,
-					end:       idx,
+					Key:       currentNode.key,
+					IsPrefix:  isPrefix,
+					CleanWord: currentNode.cleanWord,
+					Start:     start,
+					End:       idx,
 				})
 				if !isPrefix {
 					// go back to root with 2 conditions (see TestGoBackToRootTrick):

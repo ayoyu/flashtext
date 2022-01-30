@@ -100,7 +100,7 @@ func TestInsertShortThenLongSearch(t *testing.T) {
 	} else {
 		prefixFlag := true
 		for i := 0; i < 2; i++ {
-			if res[i].key == keys[i] && text[res[i].start:res[i].end+1] == keys[i] && res[i].isPrefix == prefixFlag {
+			if res[i].Key == keys[i] && text[res[i].Start:res[i].End+1] == keys[i] && res[i].IsPrefix == prefixFlag {
 				t.Logf("Found Key %v, PASS", keys[i])
 				prefixFlag = false
 			} else {
@@ -124,7 +124,7 @@ func TestInsertLongThenShortSearch(t *testing.T) {
 	} else {
 		prefixFlag := true
 		for i := 0; i < 2; i++ {
-			if res[i].key == keys[(i+1)%len(keys)] && text[res[i].start:res[i].end+1] == keys[(i+1)%len(keys)] && res[i].isPrefix == prefixFlag {
+			if res[i].Key == keys[(i+1)%len(keys)] && text[res[i].Start:res[i].End+1] == keys[(i+1)%len(keys)] && res[i].IsPrefix == prefixFlag {
 				t.Logf("Found Key %v, PASS", keys[(i+1)%len(keys)])
 				prefixFlag = false
 			} else {
@@ -162,7 +162,7 @@ func TestFalseCaseSensitiveSearch(t *testing.T) {
 		t.Errorf("FAILED len(res) != len(keys)")
 	}
 	for i := 0; i < len(keys); i++ {
-		if res[i].key != strings.ToLower(keys[i]) {
+		if res[i].Key != strings.ToLower(keys[i]) {
 			t.Errorf("FAILED res[i].key != strings.ToLower(keys[i]) ")
 		}
 	}
@@ -180,7 +180,7 @@ func TestTrueCaseSensitiveSearch(t *testing.T) {
 	if len(res) != 1 {
 		t.Errorf("FAILED len(res) != 1")
 	}
-	if res[0].key != keys[0] {
+	if res[0].Key != keys[0] {
 		t.Errorf("FAILED key: %v", keys[0])
 	}
 	t.Logf("Search Result: %v", res)
@@ -199,7 +199,7 @@ func TestNoEnglishSearch(t *testing.T) {
 		t.Errorf("FAILED result")
 	}
 	for i := 0; i < len(keys); i++ {
-		if keys[i] != res[i].key {
+		if keys[i] != res[i].Key {
 			t.Errorf("FAILED key: %v", keys[i])
 		}
 	}
@@ -318,10 +318,10 @@ func TestGoBackToRootTrick(t *testing.T) {
 		{"chetoosPiza", false},
 	}
 	for i := 0; i < len(res); i++ {
-		if res[i].key == expected[i].key && res[i].isPrefix == expected[i].flagPrefix {
-			t.Logf("PASS Key %v", res[i].key)
+		if res[i].Key == expected[i].key && res[i].IsPrefix == expected[i].flagPrefix {
+			t.Logf("PASS Key %v", res[i].Key)
 		} else {
-			t.Errorf("FAILED Key %v", res[i].key)
+			t.Errorf("FAILED Key %v", res[i].Key)
 		}
 	}
 	t.Logf("res: %v", res)
