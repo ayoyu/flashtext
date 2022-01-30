@@ -32,6 +32,8 @@ type FlashKeywords struct {
 	caseSensitive bool
 }
 
+// Instantiate a new Instance of the `FlashKeywords` with
+// a case sensitive true or false
 func NewFlashKeywords(caseSensitive bool) *FlashKeywords {
 	return &FlashKeywords{
 		root:          newTrieNode(),
@@ -40,10 +42,12 @@ func NewFlashKeywords(caseSensitive bool) *FlashKeywords {
 	}
 }
 
+// Returns the number of the keys inside the keys dictionary
 func (tree *FlashKeywords) Size() int {
 	return tree.size
 }
 
+// Returns a map of all the keys in the trie with their `cleanWord`
 func (tree *FlashKeywords) GetAllKeywords() map[string]string {
 	key2Clean := make(map[string]string, tree.size)
 	stack := make([]*TrieNode, 0, tree.nbrNodes)
@@ -99,19 +103,24 @@ func (tree *FlashKeywords) addKeyWord(word string, cleanWord string) {
 	}
 }
 
+// Add the key `word` into the trie
 func (tree *FlashKeywords) Add(word string) {
 	tree.addKeyWord(word, "")
 }
 
+// Add the key `word` into the trie with the corresponding `cleanWord`
 func (tree *FlashKeywords) AddKeyWord(word string, cleanWord string) {
 	tree.addKeyWord(word, cleanWord)
 }
 
+// Add Multiple Keywords simultaneously from a map example:
+//	keyword_dict = {
+//  	"java": ["java_2e", "java programing"],
+//  	"product management": ["PM", "product manager"]
+// 	}
+// 	trie.AddFromMap(keyword_dict)
 func (tree *FlashKeywords) AddFromMap(keys2synonyms map[string][]string) {
-	// keyword_dict = {
-	//  "java": ["java_2e", "java programing"],
-	//  "product management": ["PM", "product manager"]
-	// }
+
 	for key, listSynonyms := range keys2synonyms {
 		for _, synonym := range listSynonyms {
 			tree.addKeyWord(synonym, key)
@@ -119,6 +128,7 @@ func (tree *FlashKeywords) AddFromMap(keys2synonyms map[string][]string) {
 	}
 }
 
+// Add Multiple Keywords simultaneously from a file by providing the `filePath`
 func (tree *FlashKeywords) AddFromFile(filePath string) error {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -142,6 +152,7 @@ func (tree *FlashKeywords) AddFromFile(filePath string) error {
 	return nil
 }
 
+// Returns the corresponding `cleanWord` for the key `word` from the trie
 func (tree *FlashKeywords) GetKeysWord(word string) (string, error) {
 	currentNode := tree.root
 	for _, char := range word {
@@ -157,6 +168,7 @@ func (tree *FlashKeywords) GetKeysWord(word string) (string, error) {
 	return currentNode.cleanWord, nil
 }
 
+// Check if the key `word` exists in the trie dictionary
 func (tree *FlashKeywords) Contains(word string) bool {
 	currentNode := tree.root
 	for _, char := range word {
@@ -168,6 +180,7 @@ func (tree *FlashKeywords) Contains(word string) bool {
 	return currentNode.isWord
 }
 
+// Remove the key `word` from the trie dictionary
 func (tree *FlashKeywords) RemoveKey(word string) bool {
 	var nextNode *TrieNode
 	parent := make(map[*TrieNode]*TrieNode)
@@ -198,6 +211,13 @@ func (tree *FlashKeywords) RemoveKey(word string) bool {
 	return true
 }
 
+// the resulting output struct:
+//	- `Key`: the string keyword found in the search text
+//	- `IsPrefix` (false/true): indicates if the key A is a prefix of another string(key B)
+//		where A and B are both in the dictionary of the flash keywords
+//	- `CleanWord`: the string with which the found key will be replaced in the text.
+//               We can think of it also like the origin word of the synonym found in the text.
+//	- `Start & End`: span information about the start and end indexes if the key found in the text
 type Result struct {
 	Key       string
 	IsPrefix  bool // support for key the smallest(the prefix) and the longest match
@@ -206,6 +226,8 @@ type Result struct {
 	End       int
 }
 
+// Search in the text for the stored keys in the trie and
+// returns a slice of `Result`
 func (tree *FlashKeywords) Search(text string) []Result {
 	n := len(text)
 	if !tree.caseSensitive {
@@ -252,6 +274,8 @@ func (tree *FlashKeywords) Search(text string) []Result {
 	return res
 }
 
+// Replace the keys found in the text with their `cleanWord` if it exists
+// and returns a new string with the replaced keys
 func (tree *FlashKeywords) Replace(text string) string {
 	if !tree.caseSensitive {
 		text = strings.ToLower(text)
