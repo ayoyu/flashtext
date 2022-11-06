@@ -174,10 +174,13 @@ func TestNoEnglishSearch(t *testing.T) {
 		assert.Equal(t, keys[i], res[i].Key)
 	}
 	t.Logf("Search Result: %v", res)
-	tmpKey := "测试"
-	t.Logf("Insert Key: %v", tmpKey)
-	trie.Add(tmpKey)
+	Key := "测试"
+	t.Logf("Insert Key: %v", Key)
+	trie.Add(Key)
 	text2 := "3测试"
+	res2 := trie.Search(text2)
+	assert.Equal(t, len(res2), 1)
+	assert.Equal(t, res2[0].Key, Key)
 	t.Logf("res: %v", trie.Search(text2))
 }
 

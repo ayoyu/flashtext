@@ -12,37 +12,45 @@ The utility of the package is focused on keywords extraction and replacement wit
 $ go get github.com/ayoyu/flashtext
 ```
 
-# Principale Usage
+# Usage Overview
 
 ## Search and extract keywords (caseSensitive=false/true)
 
 ```golang
 import (
-        "fmt"
-        "github.com/ayoyu/flashtext/flash"
+	"fmt"
+
+	"github.com/ayoyu/flashtext/flash"
 )
-func main(){
-        // ************* caseSensitive=false *************************
-        flashKeyword1 := flash.NewFlashKeywords(false)
-        flashKeyword1.AddKeyWord("Foo", "dummy word") // add the key with it's clean word
-        flashKeyword1.Add("Banana") // add the key without a clean word
 
-        fmt.Println("caseSensitive=false: ", flashKeyword1.Search("Got the foo with the Banana"))
+func main() {
+	// ************* caseSensitive=false *************************
+	flashKeyword1 := flash.NewFlashKeywords(false)
+	// add the key with it's clean word (can be see also as a synonym)
+	flashKeyword1.AddKeyWord("Foo", "dummyFoo")
+	// add the key without a clean word
+	flashKeyword1.Add("Banana")
+	fmt.Println("caseSensitive=false: ", flashKeyword1.Search("Got the foo with the Banana"))
 
-        // ************* caseSensitive=true *************************
-        flashKeyword2 := flash.NewFlashKeywords(true)
-        flashKeyword2.AddKeyWord("Foo", "dummy word")
-        flashKeyword2.Add("Banana")
+	// ************* caseSensitive=true *************************
+	flashKeyword2 := flash.NewFlashKeywords(true)
+	flashKeyword2.AddKeyWord("Foo", "dummyFoo")
+	flashKeyword2.Add("Banana")
+	fmt.Println("caseSensitive=true: ", flashKeyword2.Search("Got the foo with the Banana"))
 
-        fmt.Println("caseSensitive=true: ", flashKeyword2.Search("Got the foo with the Banana"))
+	// ************ No issue with supporting other languages ***********
+	flashKeyword2.AddKeyWord("测试", "你")
+	fmt.Println("Other text structure: ", flashKeyword2.Search("3测试"))
 }
 
 ```
 
-```
-caseSensitive=false:  [{foo false dummy word 8 10} {banana false  21 26}]
+- The output
 
+```bash
+caseSensitive=false:  [{foo false dummyfoo 8 10} {banana false  21 26}]
 caseSensitive=true:  [{Banana false  21 26}]
+Other text structure:  [{测试 false 你 1 4}]
 ```
 
 The format of the resulting output is the following:
@@ -75,33 +83,35 @@ Replace the keys added to the flash keywords with their clean word if it exists.
 
 ```golang
 import (
-        "fmt"
-        "github.com/ayoyu/flashtext/flash"
+	"fmt"
+
+	"github.com/ayoyu/flashtext/flash"
 )
-func main(){
-        text := "Got the Foo and the Zoo with the Banana"
 
-        // caseSensitive=false
-        flashKeyword1 := flash.NewFlashKeywords(true)
-        flashKeyword1.AddKeyWord("Foo", "Dummy word_1")
-        flashKeyword1.AddKeyWord("Zoo", "Dummy word_2")
-        flashKeyword1.Add("Banana")
-        fmt.Println("New text(caseSensitive=true): ", flashKeyword1.Replace(text))
+func main() {
+	text := "Got the Foo and the Zoo with the Banana"
 
-        // caseSensitive=false
-        flashKeyword2 := flash.NewFlashKeywords(false)
-        flashKeyword2.AddKeyWord("Foo", "Dummy word_1")
-        flashKeyword2.AddKeyWord("Zoo", "Dummy word_2")
-        flashKeyword2.Add("Banana")
-        fmt.Println("New text(caseSensitive=false): ", flashKeyword2.Replace(text))
+	// caseSensitive=true
+	flashKeyword1 := flash.NewFlashKeywords(true)
+	flashKeyword1.AddKeyWord("Foo", "Dummy Foo")
+	flashKeyword1.AddKeyWord("Zoo", "Dummy Zoo")
+	flashKeyword1.Add("Banana")
+	fmt.Println("New text(caseSensitive=true): ", flashKeyword1.Replace(text))
 
+	// caseSensitive=false
+	flashKeyword2 := flash.NewFlashKeywords(false)
+	flashKeyword2.AddKeyWord("Foo", "Dummy Foo")
+	flashKeyword2.AddKeyWord("Zoo", "Dummy Zoo")
+	flashKeyword2.Add("Banana")
+	fmt.Println("New text(caseSensitive=false): ", flashKeyword2.Replace(text))
 }
 ```
 
-```
-New text(caseSensitive=true):  Got the Dummy word_1 and the Dummy word_2 with the Banana
+- The output
 
-New text(caseSensitive=false):  got the dummy word_1 and the dummy word_2 with the banana
+```
+New text(caseSensitive=true):  Got the Dummy Foo and the Dummy Zoo with the Banana
+New text(caseSensitive=false):  got the dummy foo and the dummy zoo with the banana
 ```
 
 ## Other docs
@@ -128,7 +138,7 @@ $ godoc -http=:8080
 
 Then browse to: `http://localhost:8080/pkg/github.com/ayoyu/flash`
 
-# Benchmark and performance
+# Benchmark
 
 ```
 $ go run benchmarks/bench_regex.go
@@ -149,10 +159,6 @@ keys_size | FlashText (s) |  Regex (s)
 ...
 ```
 
-# Differences & Improvements with the original python library
-
-...
-
 # Citation
 
 The original paper: https://arxiv.org/abs/1711.00046
@@ -172,3 +178,7 @@ archivePrefix = "arXiv",
   adsnote = {Provided by the SAO/NASA Astrophysics Data System}
 }
 ```
+
+## TODO
+
+- [ ] Make the data structure Thread-safe to be able to use it in a concurrent environment.
