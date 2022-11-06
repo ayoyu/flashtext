@@ -161,7 +161,8 @@ keys_size | FlashText (s) |  Regex (s)
 
 # Citation
 
-The original paper: https://arxiv.org/abs/1711.00046
+- The python library: https://github.com/vi3k6i5/flashtext
+- The original paper: https://arxiv.org/abs/1711.00046
 
 ```
 @ARTICLE{2017arXiv171100046S,
@@ -181,4 +182,4 @@ archivePrefix = "arXiv",
 
 ## TODO
 
-- [ ] Make the data structure Thread-safe to be able to use it in a concurrent environment.
+- [ ] Make the data structure Thread-safe to be able to use it in a concurrent environment and call it `ConcurrentFlashText` similar name to the `ConcurrentHashMap` in java 😂️ no no originality
