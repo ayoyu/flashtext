@@ -2,7 +2,7 @@
 
 This package is a golang version of the original python library [flashtext](https://github.com/vi3k6i5/flashtext), based on the [FlashText algorithm](https://arxiv.org/abs/1711.00046) which is a special version of the [Aho-Corasick algorithm](https://en.wikipedia.org/wiki/Aho%E2%80%93Corasick_algorithm).
 
-The utility of the package is focused on keywords extraction and replacement with fixed strings at **scale**, the time complexity of the algorithm doesn't depend on the number of keys being searched or replaced. For a document of size `N` (characters) and a dictionary of `M` keys to search/replace, the time complexity is `O(N)`.
+The utility of the package is focused on keywords **extraction and replacement** with fixed strings at **scale**, the time complexity of the algorithm doesn't depend on the number of keys being searched or replaced. For a document of size `N` (characters) and a dictionary of `M` keys to **search/replace**, the time complexity is `O(N)`.
 
 `Flashtext` doesn't do regular expression and it's not a replacement of `regex`
 
@@ -26,19 +26,19 @@ import (
 func main() {
 	// ************* caseSensitive=false *************************
 	flashKeyword1 := flash.NewFlashKeywords(false)
-	// add the key with it's clean word (can be see also as a synonym)
+	// add the key with its cleanWord (the cleanWord can also be seen as a synonym)
 	flashKeyword1.AddKeyWord("Foo", "dummyFoo")
-	// add the key without a clean word
+	// add the key without a cleanWord
 	flashKeyword1.Add("Banana")
 	fmt.Println("caseSensitive=false: ", flashKeyword1.Search("Got the foo with the Banana"))
 
-	// ************* caseSensitive=true *************************
+	// ************* caseSensitive=true **************************
 	flashKeyword2 := flash.NewFlashKeywords(true)
 	flashKeyword2.AddKeyWord("Foo", "dummyFoo")
 	flashKeyword2.Add("Banana")
 	fmt.Println("caseSensitive=true: ", flashKeyword2.Search("Got the foo with the Banana"))
 
-	// ************ No issue with supporting other languages ***********
+	// ************ No issue with supporting other structures, languages...etc ***********
 	flashKeyword2.AddKeyWord("测试", "你")
 	fmt.Println("Other text structure: ", flashKeyword2.Search("3测试"))
 }
@@ -79,7 +79,7 @@ type Result struct {
 
 ## Replace keywords (caseSensitive=false/true)
 
-Replace the keys added to the flash keywords with their clean word if it exists. In this example `Foo` and `Zoo` got replaced respectively with their clean words `Dummy word_1` and `Dummy word_2`, but in the case of the `Banana` key, it doesn't get replaced.
+Replace the keys added to the flash keywords with their "clean words" if they exist. In this example `Foo` and `Zoo` got replaced respectively with their clean words `Dummy Foo` and `Dummy Zoo`, but in the case of the `Banana` key, it doesn't get replaced because the key has no "clean word".
 
 ```golang
 import (
