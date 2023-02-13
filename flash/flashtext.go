@@ -229,10 +229,10 @@ type Result struct {
 // Search in the text for the stored keys in the trie and
 // returns a slice of `Result`
 func (tree *FlashKeywords) Search(text string) []Result {
-	n := len(text)
 	if !tree.caseSensitive {
 		text = strings.ToLower(text)
 	}
+	n := len(text)
 	var res []Result
 	currentNode := tree.root
 	start := 0
