@@ -132,6 +132,21 @@ func TestCaseSensitive(t *testing.T) {
 	t.Logf("allkeys: %v", allKeys)
 }
 
+func TestFalseCaseInsensitiveSearchUnicodeDoesNotPanic(t *testing.T) {
+	trie := NewFlashKeywords(false)
+	keys := []string{"İUseUnicode", "İUseUnicodeToBreakThings"}
+	for _, k := range keys {
+		trie.Add(k)
+	}
+	text := "İUseUnicode"
+	res := trie.Search(text)
+	assert.Equal(t, len(res), 1)
+	for i := 0; i < len(res); i++ {
+		assert.Equal(t, res[i].Key, strings.ToLower(keys[i]))
+	}
+	t.Logf("Search Result: %v", res)
+}
+
 func TestFalseCaseSensitiveSearch(t *testing.T) {
 	trie := NewFlashKeywords(false)
 	keys := []string{"FoO", "Banana"}
@@ -233,7 +248,6 @@ func TestOverlapRemoveKeys_2(t *testing.T) {
 	assert.Equal(t, len(trie.GetAllKeywords()), 1)
 	assert.Equal(t, trie.nbrNodes, len(keys[0])+1)
 	t.Logf("Size: %v, allKeys: %v, nbrNode: %v", trie.Size(), trie.GetAllKeywords(), trie.nbrNodes)
-
 }
 
 func TestOverlapRemoveKeys_3(t *testing.T) {
@@ -263,7 +277,6 @@ func TestOverlapRemoveKeys_3(t *testing.T) {
 	}
 	assert.Equal(t, trie.nbrNodes, nodes)
 	t.Logf("%v nbrNode: %v %v", trie.GetAllKeywords(), trie.nbrNodes, nodes)
-
 }
 
 func TestGoBackToRootTrick(t *testing.T) {
@@ -320,7 +333,9 @@ func TestAddFromMap(t *testing.T) {
 
 func TestAddFromFile(t *testing.T) {
 	trie := NewFlashKeywords(true)
-	trie.AddFromFile("./../testdata/Keys2Synonyms.txt")
+	err := trie.AddFromFile("./../testdata/Keys2Synonyms.txt")
+	assert.Nil(t, err)
+
 	testdata := []struct {
 		key        string
 		originWord string
@@ -421,6 +436,7 @@ func TestReplaceCleanWordSameLenghtKey(t *testing.T) {
 	assert.Equal(t, newText, rText)
 	t.Logf("newText: %v", newText)
 }
+
 func TestReplaceKeyAtTheEnd(t *testing.T) {
 	trie := NewFlashKeywords(true)
 	trie.AddKeyWord("in place", "gone")

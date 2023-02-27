@@ -114,11 +114,12 @@ func (tree *FlashKeywords) AddKeyWord(word string, cleanWord string) {
 }
 
 // Add Multiple Keywords simultaneously from a map example:
-//	keyword_dict = {
-//  	"java": ["java_2e", "java programing"],
-//  	"product management": ["PM", "product manager"]
-// 	}
-// 	trie.AddFromMap(keyword_dict)
+//
+//		keyword_dict = {
+//	 	"java": ["java_2e", "java programing"],
+//	 	"product management": ["PM", "product manager"]
+//		}
+//		trie.AddFromMap(keyword_dict)
 func (tree *FlashKeywords) AddFromMap(keys2synonyms map[string][]string) {
 
 	for key, listSynonyms := range keys2synonyms {
@@ -212,12 +213,12 @@ func (tree *FlashKeywords) RemoveKey(word string) bool {
 }
 
 // the resulting output struct:
-//	- `Key`: the string keyword found in the search text
-//	- `IsPrefix` (false/true): indicates if the key A is a prefix of another string(key B)
-//		where A and B are both in the dictionary of the flash keywords
-//	- `CleanWord`: the string with which the found key will be replaced in the text.
-//               We can think of it also like the origin word of the synonym found in the text.
-//	- `Start & End`: span information about the start and end indexes if the key found in the text
+//   - `Key`: the string keyword found in the search text
+//   - `IsPrefix` (false/true): indicates if the key A is a prefix of another string(key B)
+//     where A and B are both in the dictionary of the flash keywords
+//   - `CleanWord`: the string with which the found key will be replaced in the text.
+//     We can think of it also like the origin word of the synonym found in the text.
+//   - `Start & End`: span information about the start and end indexes if the key found in the text
 type Result struct {
 	Key       string
 	IsPrefix  bool // support for key the smallest(the prefix) and the longest match
@@ -229,10 +230,10 @@ type Result struct {
 // Search in the text for the stored keys in the trie and
 // returns a slice of `Result`
 func (tree *FlashKeywords) Search(text string) []Result {
-	n := len(text)
 	if !tree.caseSensitive {
 		text = strings.ToLower(text)
 	}
+	n := len(text)
 	var res []Result
 	currentNode := tree.root
 	start := 0
