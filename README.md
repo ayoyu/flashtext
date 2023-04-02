@@ -24,11 +24,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/ayoyu/flashtext/flash"
+	"github.com/ayoyu/flashtext"
 )
 
 func main(){
-	flashKeys := flash.NewFlashKeywords(false)
+	flashKeys := flashtext.NewFlashKeywords(false)
 	// add to dictionnary the key `Apple` with its cleanWord `Fruit`.
 	flashKeys.AddKeyWord("Apple", "Fruit")
 	// add to dictionnary the key `Apple` with its cleanWord `Company`.
@@ -61,7 +61,7 @@ func main(){
 From the previous example with the same added keys:
 
 ```golang
-flashKeys := flash.NewFlashKeywords(true)
+flashKeys := flashtext.NewFlashKeywords(true)
 // ...
 res := flashKeys.Search("I played football, while eating my Apple")
 for _, item := range res {
@@ -112,11 +112,11 @@ In this example `FootBall` and `Apple` will be replaced respectively with their 
 import (
 	"fmt"
 
-	"github.com/ayoyu/flashtext/flash"
+	"github.com/ayoyu/flashtext"
 )
 
 func main() {
-	flashKeys := flash.NewFlashKeywords(false)
+	flashKeys := flashtext.NewFlashKeywords(false)
 	flashKeys.AddKeyWord("Apple", "Fruit")
 	flashKeys.AddKeyWord("FootBall", "Sport")
 	flashKeys.AddKeyWord("🔥", "💪")
@@ -139,11 +139,11 @@ New text:  i played sport, while eating my fruit 💪
 import (
 	"fmt"
 
-	"github.com/ayoyu/flashtext/flash"
+	"github.com/ayoyu/flashtext"
 )
 
 func main() {
-	flashKeys := flash.NewFlashKeywords(true)
+	flashKeys := flashtext.NewFlashKeywords(true)
 	flashKeys.AddKeyWord("Apple", "Fruit")
 	flashKeys.AddKeyWord("FootBall", "Sport")
 	flashKeys.AddKeyWord("🔥", "💪")
@@ -176,7 +176,7 @@ First generate some random data or use the ones that are located in the `testdat
 $ go run testdata/gen_testdata.go
 ```
 
-(`cd` to the `benchmarks` folder)
+`cd` to the `benchmarks` folder.
 
 - Benchmark FlashText Search
 
@@ -305,4 +305,4 @@ archivePrefix = "arXiv",
 
 ## TODO
 
-- [ ] Make the data structure Thread-safe to be able to use it in a concurrent environment and call it `ConcurrentFlashText` similar name to the `ConcurrentHashMap`.
+- [ ] Make the data structure Thread-safe to be able to use it in a concurrent environment.
