@@ -333,7 +333,7 @@ func TestAddFromMap(t *testing.T) {
 
 func TestAddFromFile(t *testing.T) {
 	trie := NewFlashKeywords(true)
-	err := trie.AddFromFile("./../testdata/Keys2Synonyms.txt")
+	err := trie.AddFromFile("testdata/Keys2Synonyms.txt")
 	assert.Nil(t, err)
 
 	testdata := []struct {

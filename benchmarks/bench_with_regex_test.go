@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ayoyu/flashtext/flash"
+	flash "github.com/ayoyu/flashtext"
 )
 
 const WORDS_FILE_PATH = "./../testdata/words_benchmark_test.txt"

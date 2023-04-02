@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ayoyu/flashtext/flash"
+	flash "github.com/ayoyu/flashtext"
 )
 
 const SIZE_ = 100000
