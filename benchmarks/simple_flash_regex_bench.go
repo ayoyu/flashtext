@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	flash "github.com/ayoyu/flashtext"
+	"github.com/ayoyu/flashtext"
 )
 
 const SIZE_ = 100000
@@ -39,7 +39,7 @@ func main() {
 			tmp[i] = allWords[rand.Intn(SIZE_)]
 		}
 		corpus := strings.Join(tmp[:], " ")
-		flash := flash.NewFlashKeywords(true)
+		flash := flashtext.NewFlashKeywords(true)
 		keysWords := make([]string, keysSize)
 		for i := 0; i < keysSize; i++ {
 			tmpKey := allWords[rand.Intn(SIZE_)]

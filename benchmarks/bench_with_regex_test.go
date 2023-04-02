@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	flash "github.com/ayoyu/flashtext"
+	"github.com/ayoyu/flashtext"
 )
 
 const WORDS_FILE_PATH = "./../testdata/words_benchmark_test.txt"
@@ -43,7 +43,7 @@ func BenchmarkFlashTextSearch(b *testing.B) {
 	corpus, _ := readGenCorpusTestData(CORPUS_FILE_PATH)
 	fmt.Println("Search on a corpus text of size: ", len(corpus))
 	for keysSize := 10; keysSize < 20011; keysSize += 1000 {
-		var flash *flash.FlashKeywords = flash.NewFlashKeywords(true)
+		var flash *flashtext.FlashKeywords = flashtext.NewFlashKeywords(true)
 		for i := 0; i < keysSize; i++ {
 			flash.Add(words[rand.Intn(len(words))])
 		}

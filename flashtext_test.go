@@ -1,4 +1,4 @@
-package flash
+package flashtext
 
 import (
 	"strings"
